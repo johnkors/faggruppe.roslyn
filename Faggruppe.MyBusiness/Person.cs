@@ -11,18 +11,23 @@
 
         public long Id { get; set; }
 
-        public Adresse HentAdresse()
+        public Adresse hentAdresse()
         {
             return adresseService.HentAdresse(Id);
         }
     }
 
-    public class AdresseService
+    public class AdresseService : IAdresseService
     {
         public Adresse HentAdresse(long personId)
         {
             return new Adresse();
         }
+    }
+
+    public interface IAdresseService
+    {
+        Adresse HentAdresse(long personId);
     }
 
     public class Adresse
