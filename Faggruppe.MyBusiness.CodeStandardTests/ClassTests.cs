@@ -14,12 +14,8 @@ namespace Faggruppe.MyBusiness.CodeStandardTests
 
         [TestInitialize]
         public void Setup()
-        {
-            IWorkspace workspace;
-            workspace = Workspace.LoadSolution(@"..\..\..\Faggruppe.Roslyn.sln");
-            ISolution solution = workspace.CurrentSolution;
-            var foundProjectsByName = solution.GetProjectsByName("Faggruppe.MyBusiness");
-            _projectUnderTest = foundProjectsByName.FirstOrDefault();
+        {   
+            _projectUnderTest = RoslynHelpers.GetProject("Faggruppe.MyBusiness");
         }
 
         [TestMethod]
@@ -34,21 +30,12 @@ namespace Faggruppe.MyBusiness.CodeStandardTests
             var documents = _projectUnderTest.Documents;
             foreach (var doc in documents)
             {
-                var classes = GetNode<ClassDeclarationSyntax>(doc);
+                var classes = RoslynHelpers.GetNode<ClassDeclarationSyntax>(doc);
                 var numberOfClassKeyWordsInDoc = classes.Count();
 
                 var errorMsg = string.Format("Document {0} contains more than 1 class. Number of class keywords usage {1}", doc.Name, numberOfClassKeyWordsInDoc);
                 Assert.IsTrue(numberOfClassKeyWordsInDoc < 2, errorMsg);
             }
-        }
-
-        private static IEnumerable<CommonSyntaxNodeOrToken> GetNode<T>(IDocument doc)
-        {
-            var syntaxTree = doc.GetSyntaxTree();
-            var root = syntaxTree.GetRoot();
-            var descendants = root.DescendantNodesAndTokens();
-            var nodes = from c in descendants where c.AsNode() is T select c;
-            return nodes;
         }
     }
 }

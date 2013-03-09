@@ -3,9 +3,10 @@
     public class Person
     {
         private readonly AdresseService adresseService;
+
         public Person()
         {
-            //this.adresseService = new AdresseService();
+            this.adresseService = new AdresseService();
         }
 
         public long Id { get; set; }
