@@ -1,11 +1,14 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Roslyn.Compilers.CSharp;
+using Roslyn.Compilers.Common;
 using Roslyn.Services;
 
 namespace Faggruppe.MyBusiness.CodeStandardTests
 {
     [TestClass]
-    public class UnitTest1
+    public class ClassTests
     {
         private IProject _projectUnderTest;
 
@@ -28,20 +31,24 @@ namespace Faggruppe.MyBusiness.CodeStandardTests
         [TestMethod]
         public void BusinessProject_EachFile_ContainsAtMostOneClass()
         {
-            var classTokenKind = 8325;
             var documents = _projectUnderTest.Documents;
             foreach (var doc in documents)
             {
-                var syntaxTree = doc.GetSyntaxTree();
-                var root = syntaxTree.GetRoot();
-                var allTokensInDocument = root.DescendantTokens();
-
-               
-                var numberOfClassKeyWordsInDoc = allTokensInDocument.Count(token => token.Kind == classTokenKind);
+                var classes = GetNode<ClassDeclarationSyntax>(doc);
+                var numberOfClassKeyWordsInDoc = classes.Count();
 
                 var errorMsg = string.Format("Document {0} contains more than 1 class. Number of class keywords usage {1}", doc.Name, numberOfClassKeyWordsInDoc);
                 Assert.IsTrue(numberOfClassKeyWordsInDoc < 2, errorMsg);
             }
+        }
+
+        private static IEnumerable<CommonSyntaxNodeOrToken> GetNode<T>(IDocument doc)
+        {
+            var syntaxTree = doc.GetSyntaxTree();
+            var root = syntaxTree.GetRoot();
+            var descendants = root.DescendantNodesAndTokens();
+            var nodes = from c in descendants where c.AsNode() is T select c;
+            return nodes;
         }
     }
 }
