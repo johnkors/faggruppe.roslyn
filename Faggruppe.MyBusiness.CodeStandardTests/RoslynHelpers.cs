@@ -24,5 +24,20 @@ namespace Faggruppe.MyBusiness.CodeStandardTests
             var foundProjectsByName = solution.GetProjectsByName(projectName);
             return foundProjectsByName.FirstOrDefault();
         }
+
+        public static IEnumerable<T> GetNode<T>(IEnumerable<IDocument> documents) where T : SyntaxNode
+        {
+            var listOfNodes = new List<T>();
+            foreach (var doc in documents)
+            {
+                var syntaxTree = doc.GetSyntaxTree();
+                var root = syntaxTree.GetRoot();
+                var descendants = root.DescendantNodes();
+                var nodes = from c in descendants where c is T select c as T;
+                listOfNodes.AddRange(nodes);
+            }
+          
+            return listOfNodes;
+        }
     }
 }
