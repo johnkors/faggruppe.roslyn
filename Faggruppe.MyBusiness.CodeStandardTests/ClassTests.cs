@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Roslyn.Compilers.CSharp;
-using Roslyn.Compilers.Common;
 using Roslyn.Services;
 
 namespace Faggruppe.MyBusiness.CodeStandardTests
@@ -30,8 +28,8 @@ namespace Faggruppe.MyBusiness.CodeStandardTests
             var documents = _projectUnderTest.Documents;
             foreach (var doc in documents)
             {
-                var classes = RoslynHelpers.GetNode<ClassDeclarationSyntax>(doc);
-                var numberOfClassKeyWordsInDoc = classes.Count();
+                var classDeclarations = RoslynHelpers.GetNode<ClassDeclarationSyntax>(doc);
+                var numberOfClassKeyWordsInDoc = classDeclarations.Count();
 
                 var errorMsg = string.Format("Document {0} contains more than 1 class. Number of class keywords usage {1}", doc.Name, numberOfClassKeyWordsInDoc);
                 Assert.IsTrue(numberOfClassKeyWordsInDoc < 2, errorMsg);
