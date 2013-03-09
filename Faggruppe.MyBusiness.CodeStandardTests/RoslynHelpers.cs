@@ -39,5 +39,13 @@ namespace Faggruppe.MyBusiness.CodeStandardTests
           
             return listOfNodes;
         }
+
+        public static ISemanticModel GetSemanticModel(IProject project, IDocument doc)
+        {
+            var comp = project.GetCompilation();
+
+            CommonSyntaxTree tree = doc.GetSyntaxRoot().SyntaxTree;
+            return comp.GetSemanticModel(tree);
+        }
     }
 }

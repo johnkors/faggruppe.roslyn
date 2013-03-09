@@ -14,7 +14,7 @@ namespace Faggruppe.MyBusiness.CodeStandardTests
 
         [TestInitialize]
         public void Setup()
-        {   
+        {
             _projectUnderTest = RoslynHelpers.GetProject("Faggruppe.MyBusiness");
         }
 
@@ -30,13 +30,14 @@ namespace Faggruppe.MyBusiness.CodeStandardTests
             foreach (var doc in documents)
             {
                 var objectCreations = RoslynHelpers.GetNode<ObjectCreationExpressionSyntax>(doc);
-              
+
                 foreach (var objectCreation in objectCreations)
                 {
                     var obj = objectCreation;
-                    var id = (IdentifierNameSyntax)obj.Type;
+                    var id = (IdentifierNameSyntax) obj.Type;
                     var className = id.Identifier.ToString();
-                    var classNode = (from c in allClasses where c.Identifier.ToString() == className select c).FirstOrDefault();
+                    var classNode =
+                        (from c in allClasses where c.Identifier.ToString() == className select c).FirstOrDefault();
 
                     var arverEllerImplementerNoe = classNode.BaseList != null;
                     if (arverEllerImplementerNoe)
@@ -45,19 +46,48 @@ namespace Faggruppe.MyBusiness.CodeStandardTests
                         foreach (var baseKlasseEllerInterface in typerSomArvesEllerImplementeres)
                         {
                             var navnPåBaseKlasseEllerInterface = baseKlasseEllerInterface.ToString();
-                            var klasseSomImplementerInterfaceFunnet = navnPåInterfacer.Contains(navnPåBaseKlasseEllerInterface);
+                            var klasseSomImplementerInterfaceFunnet =
+                                navnPåInterfacer.Contains(navnPåBaseKlasseEllerInterface);
                             if (klasseSomImplementerInterfaceFunnet)
                             {
-                                var errorMsg = string.Format("Klasse som implementerer et interface skal ikke instansieres. I dokument {0}, instansiering av {1} som implementerer {2}", doc.Name, className, navnPåBaseKlasseEllerInterface);
+                                var errorMsg =
+                                    string.Format(
+                                        "Klasse som implementerer et interface skal ikke instansieres. I dokument {0}, instansiering av {1} som implementerer {2}",
+                                        doc.Name, className, navnPåBaseKlasseEllerInterface);
                                 Assert.Fail(errorMsg);
                             }
-                         
+
                         }
-                     
+
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void InterfaceImplementations_BySemanticApi_AreNotCreated()
+        {
+            foreach (var document in _projectUnderTest.Documents)
+            {
+                var semanticModel = RoslynHelpers.GetSemanticModel(_projectUnderTest, document);
+                var objectCreations = RoslynHelpers.GetNode<ObjectCreationExpressionSyntax>(document);
+                foreach (var objCreation in objectCreations)
+                {
+                    var symbolInfo = semanticModel.GetSymbolInfo(objCreation);
+                    var interfaces = symbolInfo.Symbol.ContainingType.Interfaces;
+                    if (interfaces.Count > 0)
+                    {
+                        var interfac = interfaces.First();
+                        var errorMsg =
+                                   string.Format(
+                                       "Klasse som implementerer et interface skal ikke instansieres. I dokument {0}, instansiering av {1} som implementerer {2}",
+                                       document.Name, symbolInfo.Symbol.ContainingSymbol.Name, interfac.Name);
+                        Assert.Fail(errorMsg);
                     }
                 }
              
             }
+
         }
     }
 }
