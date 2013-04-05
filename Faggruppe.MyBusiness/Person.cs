@@ -15,6 +15,11 @@
         {
             return adresseService.HentAdresse(Id);
         }
+
+        public string Speak()
+        {
+            return "Hello world from assembly!";
+        }
     }
 
     public class AdresseService : IAdresseService
@@ -32,7 +37,10 @@
 
     public class Adresse
     {
-        public string Gate { get; set; }
-        public string Postnummer { get; set; }
+        public string Gate
+        {
+            get { return "Miltangen"; }
+        }
+        public string Postnummer { get { return "2050"; } }
     }
 }
