@@ -20,9 +20,10 @@ namespace Faggruppe.MyBusiness.CodeStandardTests
         public static IProject GetProject(string projectName)
         {
             IWorkspace workspace = Workspace.LoadSolution(@"..\..\..\Faggruppe.Roslyn.sln");
+            
             ISolution solution = workspace.CurrentSolution;
             var foundProjectsByName = solution.GetProjectsByName(projectName);
-            return foundProjectsByName.FirstOrDefault();
+            return foundProjectsByName.Single();
         }
 
         public static IEnumerable<T> GetNode<T>(IEnumerable<IDocument> documents) where T : SyntaxNode
